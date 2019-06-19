@@ -3,26 +3,18 @@ Repository containing all my projects.
 
 ## Contents
 
-- ### Machine Learning
-
-	- [Some Project](linkhere): Description here
-
-	_Tools: toolsused_ 
-
 - ### Data Analysis and Visualisation
 	- __Python__
-		- project
+		- Cyclability Analysis(SQL)
 
 	- __R__ 
-		- fdsah
+		- Crash Severity and Frequency
+		- University Life and Stress
+		- International and Domestic Students
 	
-
-- ### Micro Projects: 
-
-	- __Python__
-		- fdskaf
-
-	- __R__
-		- fdsakha
+- ### Developement
+	- __Java__
+		- Atomination
+		- AeroDB
 
 If you liked what you saw, want to have a chat with me about the portfolio, work opportunities, or collaboration, shoot an email at {here}
