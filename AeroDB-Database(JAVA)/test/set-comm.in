@@ -1,0 +1,7 @@
+set a 5 5 8 3
+set b 8 8 9
+diff a b
+union a b
+inter a b
+cartprod a b
+bye

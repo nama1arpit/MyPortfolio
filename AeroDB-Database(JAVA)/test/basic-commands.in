@@ -1,0 +1,47 @@
+purge a
+push c 6
+set a 1 2 3
+snapshot
+purge a
+drop 1
+set b 7 8
+set b 5 i
+set b 5 6
+set a t 5
+push c 5
+push b 1 5.5
+push b 1 5
+append b t
+append b 6
+pick b 8
+pick b 2
+PLUCK b t
+pluck b 9
+pluck b 1
+pop b
+pop b
+pop b
+pop b
+pop b
+drop r
+rollback 4
+rollback r
+checkout 2
+checkout 6.6
+del b
+del c
+set a 6 3 4 1 5
+min a
+max a
+SUM a
+len a
+rev a
+get a
+append a 6
+uniq a
+set c 7 8
+del a
+set h 8 8
+del c
+set a 6 7 8 5 4
+sort a

@@ -1,0 +1,96 @@
+> ok
+
+> no such key
+
+> ok
+
+> saved as snapshot 1
+
+> ok
+
+> ok
+
+> ok
+
+> Please input integers in value of the key
+
+> ok
+
+> Please input integers in value of the key
+
+> no such key
+
+> Please input integers in value of the key
+
+> ok
+
+> Please input integers in value of the key
+
+> ok
+
+> index out of range
+
+> 1
+
+> Please input integers in index of the key
+
+> index out of range
+
+> 5
+
+> 1
+
+> 5
+
+> 6
+
+> 6
+
+> nil
+
+> Please input integers in id of the snapshot
+
+> no such snapshot
+
+> Please input integers in id of the snapshot
+
+> no such snapshot
+
+> Please input integers in id of the snapshot
+
+> ok
+
+> no such key
+
+> ok
+
+> 1
+
+> 6
+
+> 19
+
+> 5
+
+> ok
+
+> [5 1 4 3 6]
+
+> ok
+
+> ok
+
+> ok
+
+> ok
+
+> ok
+
+> ok
+
+> ok
+
+> ok
+
+> No input. Bye
+bye

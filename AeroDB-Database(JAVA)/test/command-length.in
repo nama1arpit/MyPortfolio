@@ -1,0 +1,58 @@
+set a
+set a 7 8
+get a
+get b
+LIST
+list snapshot
+snapshot
+list keys
+list ENTRIES
+del a
+list ENTRIES
+list keys
+list snapshot
+get
+get a
+drop
+drop 1
+del
+del b
+purge
+push c
+push c 4
+append
+append c 6
+pick
+pick d 6
+PLUCK
+pluck i
+pop
+pop g
+drop 6
+ROLLBACK
+CHECKOUT
+snapshot 5
+min
+min h
+max
+max f
+sum
+sum g
+len
+len y
+rev
+rev d
+uniq
+uniq y
+sort
+sort u
+diff
+DIFF f g
+INTER
+inter d s
+UNION
+union d d
+CARTPROD
+cartprod g g
+byyye
+BYE

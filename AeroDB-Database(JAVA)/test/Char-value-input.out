@@ -1,0 +1,72 @@
+> ok
+
+> ok
+
+> saved as snapshot 1
+
+> b [5 6]
+a [1 2 3]
+
+> Please input integers in value of the key
+
+> b [5 6]
+a [1 2 3]
+
+> Please input integers in value of the key
+
+> b [5 6]
+a [1 2 3]
+
+> Please input integers in value of the key
+
+> ok
+
+> Please input integers in value of the key
+
+> saved as snapshot 2
+
+> c [8 9 3]
+b [5 6]
+a [1 2 3]
+
+> Wrong Command!
+
+> 9
+
+> Please input integers in index of the key
+
+> [8 9 3]
+
+> Please input integers in index of the key
+
+> 1
+
+> [2 3]
+
+> Please input integers in id of the snapshot
+
+> 2
+1
+
+> Please input integers in id of the snapshot
+
+> ok
+
+> 1
+
+> ok
+
+> saved as snapshot 2
+
+> 2
+1
+
+> Please input integers in id of the snapshot
+
+> ok
+
+> d [9 34 2]
+b [5 6]
+a [2 3]
+
+> bye

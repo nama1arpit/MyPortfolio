@@ -1,0 +1,16 @@
+snapshot
+set a 1 2 3
+snapshot
+set b 7 8
+snapshot
+list snapshots
+rollback 2
+checkout 1
+drop 1
+drop 2
+snapshot
+snapshot
+drop 2
+snapshot
+snapshot
+drop 2

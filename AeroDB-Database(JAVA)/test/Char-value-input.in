@@ -1,0 +1,31 @@
+set a 1 2 3
+set b 5 6
+snapshot
+list ENTRIES
+set c 5.5
+list entries
+set a 5r 4.7 r
+list entRies
+push a 7.7 t
+set c 8 9 3
+append c 9.9 p
+snapshot
+list entries
+pic c 5
+pick c 2
+pick c 2r
+get c
+pluck a 1.0
+pluck a 1
+get a
+drop 9.0
+list SNAPSHOTS
+rollback 1t
+rollback 1
+list SNAPSHOTS
+set d 9 34 2
+snapshot
+list snapshots
+checkout 2.1
+list entRies
+bye
