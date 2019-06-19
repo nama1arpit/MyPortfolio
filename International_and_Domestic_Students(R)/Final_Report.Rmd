@@ -1,0 +1,270 @@
+---
+title: "International and Domestic Students"
+author: "Arpit: 4902983370, Benjamin: 480066938, Sam: 490369755"
+subtitle: "Project 3"
+date: "University of Sydney | DATA 1001 | May 2019"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    self_contained: yes
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+---
+
+<br>
+
+# Executive Summary
+
+- The aim of this report is to determine whether there is a significant difference between the grades of International and Domestic students, using hypothesis testing. If there was indeed a difference, then we would attempt to establish a possible cause for this, by looking to see if their frequency of using Canvas had any effect on their grades, using a scatterplot. 
+
+- Our main discoveries were that there was indeed a significant difference between the mean marks of international students and domestic ones, with a p-value of 3.389e-09. However, we were unable to show any sort of relationship between how often the students used Canvas and their marks, so we can conclude from our analysis that there are other factors that may have caused international students to do worse than domestic ones.
+
+
+<br>
+
+# Full Report
+
+## Initial Data Analysis (IDA)
+
+The dataset was provided by the University of Sydney and contains information from 15 first year Mathematics units, from 2012 to 2017, with a sample size of 10,845 students. This provides a large sample from which we can extrapolate conclusions about the entire University population in the past and future.
+
+The stakeholders for our research question would be the University itself, specifically the student center. Our analysis suggests that international students do worse than their domestic counterparts, the University could plan more programs to welcome international students and help them get used to living in another country. By helping them settle in a faster and more comfortable way like creating equal casual job opportunities and accommodation, this may get rid of the difference between their grades and those of the domestic students. The University would have a vested interest in making sure that international students do well, because having them promotes diversity, develops international ties in future research projects, and generates income for the country. 
+
+Some confounding factors could be the fact that only first-year students and mathematics units were considered in this sample, so extrapolating our findings to the rest of the population in other faculties across different years might be less accurate. However, with such a large sample size gathered across many years, we are inclined to believe that the margin of error is small enough to draw conclusions about a wider population.
+
+
+<br>
+```{r,echo=FALSE, include=FALSE}
+library(kableExtra)
+library(dbplyr)
+library(tidyverse)
+library(ggplot2)
+
+#Reading data from Data.csv
+data = read.csv("data/Data.csv")
+data_dom = subset(data, Dom.Int == 'Domestic', select = c(Mark, Unit.of.Study.Identifier))
+data_int = subset(data, Dom.Int == 'International', select = c(Mark, Unit.of.Study.Identifier))
+
+# Adding new Canvas_Total coloumn
+```
+
+<br>
+Size of data
+```{r}
+dim(data)
+```
+<br>
+R's classification of data
+```{r}
+class(data)
+```
+<br>
+R's classification of variables
+```{r}
+str(data)
+```
+
+Summary:
+
+- The initial dataset had 23 columns, out of which we used 16. 
+
+- The Unit of Study column was a qualitative discrete variable, with letters denoting which Unit of Study it was.
+
+- The Dom/Int column was a qualitative discrete variable, simply indicating whether the student was domestic or international.
+
+- The Mark column was a quantitative discrete variable, representing the student's marks out of 100 for the unit.
+
+- The columns for whether the student had used canvas during that specific week were qualitative discrete, simply detailing whether they did or did not used it.
+
+
+<br>
+
+## Research Question
+
+Australia, specifically New South Wales, is becoming an increasingly popular option for International students seeking university education. The tertiary education sector provides the Australian economy with up to $32 billion per annum; Universities Australia stated that education is the country's 3rd largest export and is growing at an exponential rate. Not only is this beneficial to the country's economy, but a high influx of international students also boosts diversity and international ties whilst providing valuable education to those seeking it around the world. Universities within Australia must provide enough facilities for international students, to not only help them live comfortably but to also help them succeed in their desired career. This is important as it will encourage more students to travel to gain education in Australia. 
+
+
+Graphs from Export income to Australia from international education activity in 2016-17. Australian Government, Department of Education and Training.  December 2017.
+Within our research question, we looked at whether International students on average were getting the same marks as Domestic students. We used this as our null hypothesis; that the difference in average marks for international and domestic students would not be significantly different. This will reveal whether the University of Sydney is providing enough resources and support to those students who have come from overseas. According to the University of Sydney website, it is regularly ranked in the top 50 universities in the world, so their ability to live up to this standard is integral in maintaining their image, to attract international students.
+
+The University of Sydney does provide many avenues for support for international students. The university website itself has a page solely based on helping international students succeed and reach their full potential, whilst maintaining their student visas and mandatory compliance paperwork. There are also many options within the campus grounds for support such as student accommodation, and face to face mentoring that assists undergraduates in understanding their rights and responsibilities whilst attending the University of Sydney. The Australian government also has created a legal responsibility for all Universities to provide a high level of education and quality care for anyone studying on a student visa; Education Services for Overseas Students (ESOS).
+ 
+
+T-Test for marks of domestic and international students without splitting by units
+```{r}
+t.test(data_dom$Mark, data_int$Mark)
+```
+<br>
+Table for p-values of all units
+```{r}
+table = data.frame("Units" = c("A","C","G","H","K","M","O","Q","S","T","V","W","X","Y","Z"), "P Value" = c(0.2232, 0.9894, 0.9338, "<2.2e-16", 0.9736, 0.9981, 0.9682, 0.9999, 0.006201, 0.02281, "4.337e-10", 0.9684, "7.623e-16", 0.1212, 0.04019))
+
+table %>% kable() %>% kable_styling(bootstrap_options = "striped")
+```
+
+
+After our analysis, we found significant difference in the average marks of the two groups respectively; with Domestic Students having significantly higher average marks for 6/15 of the units. Our p-value of 3.389e-09 is so miniscule that we can confidently reject the null hypothesis. The average mark for all subjects was 66.66 for domestic students and 64.92 for international students. Although this margin is so small, the results come from relatively large sample sizes, increasing their accuracy and reliability. They therefore provide realistic representations of the disparity between the two groups.
+
+```{r}
+data$canvas_total = data %>% select(9:23) %>% rowSums()
+ggplot(data, aes(x=data$canvas_total, y=data$Mark)) + geom_point() + xlab("No. of Times Canvas Accessed in Total") + ylab("Marks")
+```
+
+
+While analyzing this data, we considered whether Canvas use could be a contributing factor towards achieving better results. We found that there was no relationship between Canvas access and average marks across all 15 subjects. The disparity therefore either must be due to the individual differences within each group or due to a less support services for International students. Once again considering the large sample size, individual differences of each group would be nullified. 
+
+Our data reveals that due to USYD's proactive International Student support, International students are relatively on par with Domestic students. However, it also reveals that International students are still at a disadvantage compared to their domestic counterparts. The university should look at ways of decreasing this disparity to allow all students an equal chance to succeed within their desired fields. Our p value of 3.389e-09 is so miniscule that we can confidently reject the null hypothesis, with a small margin of error. The university will therefore have to investigate where this disadvantage originates from and whether it is reversible. Once accommodated for, this will enable international students to have equal opportunities. Equality within the university will extrapolate the already growing influx of international students, leading towards a plethora of benefits.
+  
+
+
+T-tests for marks of Domestic and International students separated by units
+
+UNIT A
+```{r}
+data_dom_A = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT A'), ]
+data_int_A = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT A'), ]
+
+t.test(data_dom_A$Mark, data_int_A$Mark, alternative = "greater")
+```
+
+
+UNIT C
+```{r}
+data_dom_C = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT C'), ]
+data_int_C = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT C'), ]
+
+t.test(data_dom_C$Mark, data_int_C$Mark, alternative = "greater")
+```
+
+
+UNIT G
+```{r}
+data_dom_G = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT G'), ]
+data_int_G = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT G'), ]
+
+t.test(data_dom_G$Mark, data_int_G$Mark, alternative = "greater")
+```
+
+UNIT H
+```{r}
+data_dom_H = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT H'), ]
+data_int_H = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT H'), ]
+
+t.test(data_dom_H$Mark, data_int_H$Mark, alternative = "greater")
+```
+
+UNIT K
+```{r}
+data_dom_K = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT K'), ]
+data_int_K = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT K'), ]
+
+t.test(data_dom_K$Mark, data_int_K$Mark, alternative = "greater")
+```
+
+UNIT M
+```{r}
+data_dom_M = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT M'), ]
+data_int_M = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT M'), ]
+
+t.test(data_dom_M$Mark, data_int_M$Mark, alternative = "greater")
+```
+
+UNIT O
+```{r}
+data_dom_O = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT O'), ]
+data_int_O = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT O'), ]
+
+t.test(data_dom_O$Mark, data_int_O$Mark, alternative = "greater")
+```
+
+UNIT Q
+```{r}
+data_dom_Q = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT Q'), ]
+data_int_Q = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT Q'), ]
+
+t.test(data_dom_Q$Mark, data_int_Q$Mark, alternative = "greater")
+```
+
+UNIT S
+```{r}
+data_dom_S = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT S'), ]
+data_int_S = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT S'), ]
+
+t.test(data_dom_S$Mark, data_int_S$Mark, alternative = "greater")
+```
+
+UNIT T
+```{r}
+data_dom_T = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT T'), ]
+data_int_T = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT T'), ]
+
+t.test(data_dom_T$Mark, data_int_T$Mark, alternative = "greater")
+```
+
+UNIT V
+```{r}
+data_dom_V = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT V'), ]
+data_int_V = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT V'), ]
+
+t.test(data_dom_V$Mark, data_int_V$Mark, alternative = "greater")
+```
+
+
+UNIT W
+```{r}
+data_dom_W = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT W'), ]
+data_int_W = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT W'), ]
+
+t.test(data_dom_W$Mark, data_int_W$Mark, alternative = "greater")
+```
+
+
+UNIT X
+```{r}
+data_dom_X = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT X'), ]
+data_int_X = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT X'), ]
+
+t.test(data_dom_X$Mark, data_int_X$Mark, alternative = "greater")
+```
+
+
+UNIT Y
+```{r}
+data_dom_Y = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT Y'), ]
+data_int_Y = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT Y'), ]
+
+t.test(data_dom_Y$Mark, data_int_Y$Mark, alternative = "greater")
+```
+
+
+UNIT Z
+```{r}
+data_dom_Z = data_dom[which(data_dom$Unit.of.Study.Identifier == 'UNIT Z'), ]
+data_int_Z = data_int[which(data_int$Unit.of.Study.Identifier == 'UNIT Z'), ]
+
+t.test(data_dom_Z$Mark, data_int_Z$Mark, alternative = "greater")
+```
+
+
+# Conclusion
+
+Tertiary education has a pivotal role within Australia, providing a stable source of income, culture and education for the country. Many undergraduates within Australian universities are international students who have ventured from overseas to study on a student visa. It is integral to these students that they have equal opportunities as any domestic student. We found that within the University of Sydney, domestic students have an advantage over international students; they have higher average marks. The reason for this disparity should be examined and altered to enable International students to reach their full potential. If this problem is addressed, international students will continue to view Australia and the University of Sydney specifically as a viable option for their education. 
+
+# Further Reseach and References
+
+1. [Australia's Education Export, Universities Australia](https://www.universitiesaustralia.edu.au/Media-and-Events/media-releases/Australia-s-education-exports-at-record-high#.XOZSitMzaAw)
+
+2. [The University of Sydney ranking](https://sydney.edu.au/about-us/our-world-rankings.html)
+
+3. [International Students Support, The University of Sydney](https://sydney.edu.au/students/support-for-international-students.html)
+
+4. [Income as Export, International Education](https://internationaleducation.gov.au/research/Research-Snapshots/Documents/Export%20Income%20FY2016%E2%80%9317.pdf)
+
+5. [ESOS-Regulations, International Education](https://internationaleducation.gov.au/Regulatory-Information/Education-Services-for-Overseas-Students-ESOS-Legislative-Framework/ESOS-Regulations/Pages/default.aspx)
+
+
+<br>

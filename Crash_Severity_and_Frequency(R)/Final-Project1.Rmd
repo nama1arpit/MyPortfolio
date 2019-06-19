@@ -1,0 +1,208 @@
+
+---
+title: "Crash Severity and Frequency"
+author: "480066938, 490369755, 490301320, 490283370"
+subtitle: "DATA1001 Project 1"
+date: "University of Sydney | DATA1001 | MARCH 2019"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    self_contained: yes
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+---
+
+<br>
+
+# Executive Summary
+Our report aims to determine whether certain factors affect the frequency or severity of car crashes and draw conclusions about what the government should do to limit these. By plotting graphs and doing the relevant statistical analysis, we have attempted to show strong relationships between drug usage, license type, and weather conditions, with the severity and frequency of accidents respectively. 
+
+Our main discoveries have been that, at least for South Australia, laws could be put in place to minimize the number of injuries sustained in car crashes. With our analysis, the Department of Planning, Transport and Infrastructure might be able to implement new laws or changes to existing ones and monitor any changes in the data for a year, and therefore observe any direct effects of the laws on the car crashes. 
+
+
+<br>
+
+# Full Report
+
+## Initial Data Analysis (IDA)
+
+We were interested in researching the current laws that are in place to minimize the number of car crashes, and whether the data justified the laws or not. 
+
+The major stakeholder for these research questions would be the government, and the Department of Planning, Transport and Infrastructure could use the analysis of this data to institute new laws targeting the most problematic factors, since our research has identified them and shown whether there are correlations between these factors and the frequency or severity the crashes. Although our data only includes South Australia, the government should be able to compare our data to data from other states and see if there is a noticeable effect of any law not present in both states. Furthermore, if a law that is enforced in one state but not the other shows to have no significant effect on the number or severity of car crashes, the government can consider changing it or getting rid of it entirely. 
+
+The data we used was taken from:
+
+https://data.gov.au/dataset/ds-sa-21386a53-56a1-4edf-bd0b-61ed15f10acf/distribution/dist-sa-8c4689ce-d3cb-413c-a467-674e00fb9115/details?q=car+accidents&fbclid=IwAR3YNwjXm3QiWYkqL5FNywWP9kYUSNPDQLZw8pjzOAx_eZbwIQQCkoXN8Mw
+
+which is a reliable site with official publications maintained by the Australian government, detailing all reported road crashes and casualties in South Australia from 2017. Although the data is only from South Australia, we believe that with such a large data set, it can serve as a reliable sample of the entire Australian population.
+
+Variables that we were interested in or seemed interesting were taken out and combined into a separate file for better accessibility.
+
+
+```{r}
+
+data <- read.csv("data/road crash.csv", header = T)
+
+str(data)
+
+```
+
+The dataset totals a 28,163 observations, with 15 columns of variables and each row representing a crash occurrence. Specific meanings of the variables are:
+
+Total.Cas - Total Casualties
+Total.Fats - Total Fatalities
+Total.SI - Total Severe Injuries
+Total.MI - Total Minor Injuries
+CSEF.Severity - Crash Severity with "PDO"(Property Damage Only), "MI"", "SI"" and "Fatal"" levels
+
+All other variables are self-explanatory or will be given further detail later. The only factor class in contention was Area.Speed and whether it should be a factor or int as speed limits are usually only certain numbers. Ultimately, we decided to leave it as it was, since it did not interfere with any of the analysis we made.
+
+Although the data was relatively clean, potential problems that we anticipated were empty data entries and numerous factor levels, which could provide complications in presenting graphs and statistics. As counting empty entries or "unknown" entries could confound any analysis we may made, we decided that omitting them when presenting graphs that use those variables was the best direction to take as the dataset was large enough to still show us reliable sample statistics.
+
+We then began considering existing laws that might or might not be effective in lowering road accidents in relation to the data. As a result, we settled on: variable speed limits changing with weather conditions, restrictions on how many passengers were allowed for drivers with P1 license types, and whether drugs influence crash severity enough to justify random drug testing on motorists.
+
+
+
+<br>
+
+## Research Questions
+
+### Do we need variable speed limits changing with weather conditions? 
+
+According to government websites, there aren't many variable speed limits in Australia with few usually in outskirts where flooding is more of a concern. Should the government set laws so that drivers must lower speed limits in raining conditions?
+```{r}
+
+counts <- table(data$Weather.Cond, data$Area.Speed)
+counts = counts[-1,]  #Removing the redundant row
+sums = apply(counts,2,sum)
+sums.table = rbind(sums, sums, sums)  # Creating a sum table of same dimension as counts
+table_rain = round(counts/sums.table,3)*100  #Calculating percentage of different weather condition
+
+#Creating a graph
+barplot(table_rain[2, ], xlab="Area Speed Limit", main = "Percentage of accidents during rain", names.arg=c("5","10","15","20","25","30","40","50","60","70","80","90","100","110"), col="lightblue")
+```
+
+The coordinate axes here depict:
+
++ x-axis: Discrete quantitative variable - "Area Speed Limit"
++ y-axis: Continuous quantitative variable - "Percentage of Accidents during rain"
+
+**Percentage of Accidents during rain (variable on y-axis)**: In the dataset we were given the area speed limit and weather condition(if it's raining or not). So, we calculated the summation of the number of accidents during rains in every given speed limit and the total accidents that happened in the respective speed limits. Thus, their ratio multiplied by hundred gave us the percentage of accidents that happened during rain.
+
+$$y =  \frac{Number of Accidents during rain}{Total number of accidents}\times 100$$
+
+**Area Speed Limit (variable on x-axis)**: In the dataset we were given the particular speed limits in the areas where accidents happened.
+
+Summary: 
+
+Thus, we can conclude that more percentage of accidents happened at higher speeds during rainy weather conditions. As we see in the graph, more accidents happen at higher speeds during rainfall, so there should be some law which decreases the particular speed limit of respective areas during rain. Special care should be taken at higher speed limits. Therefore, South Australia should implement laws regarding variable speed restrictions like NSW and Tasmania.
+
+### Are the passenger restrictions on P1 licenses justified?
+
+P1 Licenses are restricted to only 1 passenger after 11pm in NSW, with special exceptions to those that apply (e.g. regularly working late that requires driving multiple people). Is this law justified or can this be revised so that time is not lost reviewing special cases? First, we consider whether more crashes happen with a larger amount of people in the car for P1 drivers and then we will consider if day or night influences these crashes.
+
+A subset of data is first created that only looks at crashes that involved P1 licenses. We then compare that with all other licenses since there are different amounts of crashes per occupant level to obtain ratios. A grouped bar plot is then used to try compare the amount of crashes P1 licenses have depending on the number of occupants in the car.
+
+```{r}
+P1 <- subset(data, Licence.Type=="Provisional 1 ", select=c(Number.Occupants, DayNight))
+occ<-table(P1$Number.Occupants)
+occALL<-table(data$Number.Occupants)
+occALL2<- occALL[2:6] #excludes empty entries in number of occupants up to 5 since P1 only goes up to 5
+merge<- rbind(occ, occALL2)
+
+barplot(merge, beside=T, main="Number of crashes per occupant", xlab="Number of Occupants", col=c("orange", "lightgreen"), legend=c("P1", "All"))
+
+c(occ[1]/occALL2[1], occ[2]/occALL2[2], occ[3]/occALL2[3], occ[4]/occALL2[4], occ[5]/occALL2[5])
+
+
+```
+
+We can see from that ratios that the having more than 1 person in the car with a P1 license does indeed increase the amount of crashes compared to the rest of the license holders.
+
+We then test if there are a greater amount of crashes during the night, and so we compare the subset of P1 drivers to the rest of the data.
+
+```{r}
+
+day<-table(P1$DayNight)
+day2<-day[2:3]
+dayALL<-table(data$DayNight)
+dayALL2<-dayALL[2:3]
+merge2<-rbind(day2, dayALL2)
+
+barplot(merge2, beside=T, main="Number of crashes in Day or Night", col=c("orange", "lightgreen"), legend=c("P1","All"))
+
+c(day2[1]/dayALL2[1], day2[2]/dayALL2[2])
+
+```
+
+Using the ratios, we can see that there is barely any difference.
+
+Summary:
+
+The data shows that there is a significant difference in driving alone and having passengers for P1 drivers and that day or night driving does not influence the amount of crashes. This could mean that P1 license holders should always not drive with any passengers .
+
+### Do drugs affect crash severity and does that justify implementing random drug testing?
+
+Recently, Mobile Drug Testing (MDT) has risen in prominence across New South Wales, as the State government rolls out a new campaign to reduce the prevalence of accidents happening on the roads. Cars are being pulled over but, instead of alcohol, the drivers are being tested for cannabis, methamphetamines, cocaine and ecstasy. This is because according to https://roadsafety.transport.nsw.gov.au/campaigns/mobile-drug-testing/index.html, "illegal drugs are involved in more fatal crashes than drink driving". Recent studies however have shown that the campaign may not be as effective or efficient as originally thought. The test detects the presence of drugs in a driver's oral fluid. This however can be misleading, as drugs often remain in the driver's system for days after the effects have worn off. The MDT program therefore does not always measure if the driver is driving a motor vehicle under the influence of a drugs (pg. 4, Standard Operating Procedure, NSW Police). 
+
+```{r}
+data <- read.csv("data/road crash.csv", header = T)
+
+tab<-table(data$Drugs.Involved, data$CSEF.Severity)
+
+barplot(tab,ylab = "No. of Accidents" ,legend =c("No Drug","Drug"), col = c("lightgreen","blue"), main = "Graph of Overall Severity", names.arg = c("No Damage", "Property Damage", "Minor Injury", "Serious Injury", "Fatal"), space = 4 )
+
+```
+
+As we can see the data is negatively skewed, with majority of accidents being property damage only, or no damage at all. However there are still a proportion of crashes that have injuries involved.
+
+
+```{r}
+
+data <- read.csv("data/road crash.csv", header = T)
+
+tab1<-table(data$Drugs.Involved)
+
+barplot(tab1, col = "lightblue", main = "Drug related and Non-Drug related accidents", names.arg = c("No Drug", "Drug"), ylab = "No. of Accidents")
+
+```
+
+Shown here in the data, the amount of non-drug related accidents greatly supersedes the amount of drug related accidents. Drug related accidents are a distinct minority. However, lets look at the severity of the accidents compared to the number of accidents respectively. 
+
+####Comparing both graphs
+
+```{r}
+data <- read.csv("data/road crash.csv", header = T)
+
+tab<-table(data$Drugs.Involved, data$CSEF.Severity)
+
+barplot(tab, main = "Comparing both graphs", beside =TRUE, col = c("lightblue", "lightgreen"), legend = c("NO","YES"), names.arg = c("No Damage", "Property", "Minor Injury", "Serious Injury", "Fatal"))
+
+```
+
+As we can see, the amount of minor injuries in drug related cases is extremely high for the amount of crashes. The amount of fatalities (although small) are almost equal for both data sets. 
+
+Summary: 
+
+Therefore, we can draw the conclusion that drug related crashes have a higher rate of severity then non-drug related cases. The NSW Government's campaign of MDT's is warranted, as drug related accidents have a higher chance of endangering life and property.
+
+<br>
+
+# Conclusions
+
+To conclude, our research has shown that there is a link between weather conditions and the frequency of car crashes for different speed limits, license types and number of incidents, and drug usage and severity of crashes. We propose that the government should use our analysis to implement laws that might minimize the frequency and severity of car crashes by having an effect on the speed limits, rules for different license types, and prevalence of driving under the influence of drugs.
+
+# References
+
+1. https://data.gov.au/dataset/ds-sa-21386a53-56a1-4edf-bd0b-61ed15f10acf/distribution/dist-sa-8c4689ce-d3cb-413c-a467-674e00fb9115/details?q=car+accidents&fbclid=IwAR3YNwjXm3QiWYkqL5FNywWP9kYUSNPDQLZw8pjzOAx_eZbwIQQCkoXN8Mw
+
+2. https://roadsafety.transport.nsw.gov.au/campaigns/mobile-drug-testing/index.html
+
+
+
+
+

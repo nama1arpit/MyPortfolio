@@ -1,0 +1,252 @@
+---
+title: "University Life and Stress"
+author: "Arpit: 4902983370, Benjamin: 480066938, Sam: 490369755"
+subtitle: "Project 2"
+date: "University of Sydney | DATA 1001 | April 2019"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    self_contained: yes
+    theme: flatly
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+---
+
+<br>
+
+# Executive Summary
+- The aim of this report is to determine what factors of university life correlate the most with stress, to find out whether the time spent on each activity has a linear relationship with stress, and what the best way to reduce stress is. After designing a survey filled out by university students, we have attempted to analyze the responses with relevant graphs and show a correlation or relationship that can answer our research questions.
+
+- Our main discoveries are that there is not a very strong correlation between the time spent on each facet of university life and stress, which is unexpected. No strong conclusions can be drawn from our current data set, and as such, we believe that the reason for this is because individuals are too different for us to have a catch-all generalization across the board. More research should be done with a larger sample size, and potentially better designed survey questions, but that is beyond the scope of this report.
+
+<br>
+
+# Full Report
+
+## Initial Data Analysis (IDA)
+
+We kept our research questions in mind while designing our survey. To make the variable for time spent on each aspect of the participants' university life continuous, we asked for a number instead of giving them options to choose from. We did the same for stress levels, but since we anticipated that participants would give integer values and therefore make the variable discrete, we attempted to force it to be continuous by asking them to provide a number from 1-100 instead of 1-10. In our graphs, we divided all the responses by 10, and shrunk the scale down to 1-10. That way, integer responses such as 14 would become a decimal like 1.4.
+
+The participants were all university students, but not necessarily from the University of Sydney. Many of them were from Singapore and India. Although our sample size of 53 was respectable, introducing some extra factors like differences in culture, school, country, etc.. may have made the data more varied and contributed to the lack of a strong trend in our first research question.
+
+The survey was made on Google Forms, and propagated by our group members sending the link. We believe that the only potential introduction of errors would be the participants not answering correctly or precisely, despite their best intentions, seeing as Google forms is a secure and reliable method of collecting answers.
+
+<br>
+```{r,echo=FALSE, include=FALSE}
+#Importing "plotly" library
+library("plotly")
+
+#Importing the data-set
+data = read.csv("data/Uni_Life_Stress.csv")
+
+#Removing the "TimeStamp" column that come from Google Forms
+data = data[, -1]
+
+#Giving appropriate names to columns
+names(data) = c("Lec_Rank","Soc/Sport_Rank","Club_Rank", "Assignments_Rank","Commute_Rank","Fam_Rank", "Less_Sleep_Rank", "Lec_Time", "Soc/Sport_Time", "Club_Time", "Assignment_Time", "Commute_Time", "Fam_Time","Sleep_Time", "Reduce_Stress_Factors", "Stress_Level")
+
+# Adding new Stress Level Scale
+data$Stress_Level_New = (data$Stress_Level/10)
+```
+
+<br>
+Size of data
+```{r}
+dim(data)
+```
+<br>
+R's classification of data
+```{r}
+class(data)
+```
+<br>
+R's classification of variables
+```{r}
+str(data)
+```
+
+Summary:
+
+- Our intial dataset had 17 columns, from the 10 questions in our survey.
+
+- All the "_Rank" columns were distinct quantitative variables, being how high each individual ranked them as a contribution to stress, with a maximum of 7 being the most contributing and 1 being the least.
+
+- All the "_Time" columns were continuous quantitative variables detailing the number of hours each participant spent on that activity per week, except for Sleep_Time which was number of hours per day.
+
+- "Reduce_Stress_Factors" simply detailed how many people did each of the activities to reduce their stress levels.
+
+- The "Stress_Level" columns were the number, individuals gave to describe how stressed they were.
+
+- All the variables in the R output matched what we would use them for.
+
+- While cleaning the data we identified non-serious responses which introduced great outliers and remove them and change the column names in R from the initial data set.
+
+<br>
+
+## Which aspect of University life is the most correlated to stress?
+
+While completing a university degree, students undoubtedly become quite familiar with stress. According to the University of Leicester's Study Guide, stress has the potential to be an important motivator and energizer, however, it also has the potential to be a negative influence on a student and his/her mental health.
+
+We chose to distinguish what factors in a student's life are linked to higher rates of stress, which were lectures, sports, partying, doing assignments, family, commuting and sleeping. While researching this topic we found that without a large sample size it would be difficult to analyze such data, this was due to individuality of students. So, for majority of our factors there was very little correlation, and small correlation coefficients. 
+
+Interestingly, how many hours of sleep a student got every night had a negative correlation to stress levels.
+ 
+```{r}
+#Plotting a Scatter plot
+Sleep_Time_Graph = plot_ly(data, x = ~data$Sleep_Time, y = ~data$Stress_Level_New, name = 'Data Points', type = 'scatter', mode = 'markers', marker = list(size = 10, color = 'rgba(158,202,225, 0.9)', line = list(color = 'rgba(8, 48, 107, 0.8)', width = 2)))
+
+#Adding Regression Line
+Sleep_Time_Graph = add_trace(Sleep_Time_Graph, x = data$Sleep_Time,  y = predict(lm(data$Stress_Level_New~(data$Sleep_Time))), mode = "lines-markers", name = "Linear Regression")
+
+#Formatting the Graph
+Sleep_Time_Graph = layout(Sleep_Time_Graph, xaxis = list(title = "Hours of Sleep per day"), yaxis = list(title = "Stress Level (Out of 10)"))
+
+Sleep_Time_Graph
+```
+Correlation Coefficient: 
+```{r}
+cor(x = data$Sleep_Time, y = data$Stress_Level_New)
+```
+
+This graph has a correlation coefficient of -0.35, displaying that an increase in hours of sleep every night reduced stress levels. Although, this relationship is not as profound as we expected.
+
+Another of our factors that produced a high correlation coefficient was time spent in lectures.
+
+```{r}
+#Plotting a Scatter plot
+Lec_Time_Graph = plot_ly(data, x = ~data$Lec_Time, y = ~data$Stress_Level_New, type = 'scatter', name = "Data Points", mode = 'markers', marker = list(size = 10, color = 'rgba(158,202,225, 0.9)', line = list(color = 'rgba(8, 48, 107, 0.8)', width = 2)))
+
+#Adding a Regression line
+Lec_Time_Graph = add_trace(Lec_Time_Graph, x = data$Lec_Time,  y = predict(lm(data$Stress_Level_New~(data$Lec_Time))), name = "Linear regression", mode = "lines-markers")
+
+#Fromatting the Graph
+Lec_Time_Graph = layout(Lec_Time_Graph, xaxis = list(title = "Hours of Lectures per week"), yaxis = list(title = "Stress Level (Out of 10)"))
+Lec_Time_Graph
+```
+Correlation Coefficient: 
+```{r}
+cor(x = data$Lec_Time, y = data$Stress_Level_New)
+```
+
+As seen in this graph, an increase in the time spent watching lectures is correlated to increase in stress. This had a correlation coefficient of 0.32. We deduced this relationship occurred due to ignorance and investment; when people regularly don't watch lectures, they are either not aware of how much content they are missing or do not care enough about University. 
+
+## What seems to be the best way to reduce stress?
+
+ In our next research question, we decided to uncover what activities best reduced the stress levels of our participants. In our survey, we gave them a list of activities usually used to reduce stress and asked them to pick two of them.
+
+We then made a bar plot of the average stress levels against the activities done.
+
+```{r}
+#Calculating count of each stress reducing factor
+
+Walk_Stress = data[grep('Go on a walk', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Sports_Stress = data[grep('Play some sports', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Drinks_Stress = data[grep('Go for drinks', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Novels_Stress = data[grep('Reading novels or articles', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+TV_Stress = data[grep('Watching Television', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Comp_Games_Stress = data[grep('Playing Computer Games', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Sleep_Stress = data[grep('Sleep', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Fam_Stress = data[grep('Spend time with family and friends', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Smoke_Stress = data[grep('Smoke', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+Youtube_Stress = data[grep('Youtube', data$Reduce_Stress_Factors), ]$Stress_Level_New
+
+X_names = c("Drinks", "Comp-Games", "Reading", "Sports", "Smoke", "Sleep", "Family/Friends", "TV", "Walk", "Youtube")
+
+#Averaging the Count of each stress reducing factor
+Y_Values = c(mean(Walk_Stress), mean(Sports_Stress), mean(Drinks_Stress), mean(Novels_Stress), mean(TV_Stress), mean(Comp_Games_Stress), mean(Sleep_Stress), mean(Fam_Stress), mean(Smoke_Stress), mean(Youtube_Stress))
+
+#Sorting the Stress levels
+Y_Values = sort(Y_Values)
+
+#Producing and Formatting the Graph
+Reduce_Stress_Graph = plot_ly(data, x = ~X_names, y = ~Y_Values, type = 'bar', text = Y_Values, marker = list(color = 'rgb(158,202,225, 0.0)', line = list(color = 'rgb(8, 48, 107)', width = 1.2)))
+Reduce_Stress_Graph = layout(Reduce_Stress_Graph, title = "Stress Level vs Reducing Factors", xaxis = list(title = "Stress Reducing Factors", categoryorder = "array", categoryarray = Y_Values), yaxis = list(title = "Average Stress Level (Out of 10)"), paper_bgcolor = 'rgba(245, 246, 249, 1)', plot_bgcolor = 'rgba(245, 246, 249, 1)')
+
+Reduce_Stress_Graph
+```
+
+Smoking and watching YouTube videos both were filled out by one person each, so for our analysis we left them out. The most effective method of coping with stress seemed to be going out for drinks, followed by playing computer games, while the least effective one apart from watching YouTube videos was going on walks, followed by watching TV.
+
+We have some concerns about possible confounding factors, like the personalities of people who use these activities. For example, perhaps people who go for drinks might care less about their university grades or have better support networks for dealing with stress compared to people who cope via watching TV or going out for walks. There may not be an even distribution across all the methods of dealing with stress, so some of them might have smaller samples than others. However, within the limits of this survey, dealing with these confounding factors is beyond the scope of this report.
+
+Summary:
+
+We preferred to refrain from drawing specific conclusions of whether certain methods are objectively better than others, simply because of the uniqueness of the students. 
+
+
+## How does time allocation of different activities influence stress levels?
+
+In the survey we asked the participants for their general stress level and asked them to rate the 7 factors contributing to that stress individually. (We used the same factors as Question 1- lectures, sports, partying, doing assignments, family time, commuting and sleeping). 
+
+The factors work in conjunction and are not independent of each other. This question is therefore focused on time management; investigating how students allocate their hours of the week to activities. This helped to increase the amount of usable data we received by eliminating the effects caused by having a smaller sample size with individual differences. 
+
+We found that if a student has to commute for multiple hours a week, they identified that commuting was a larger factor of stress within their life. This was exemplified through the positively skewed data in the bar plot.
+
+```{r}
+#Calculating Avg Rank of each interval of Commute factor
+
+`Commute_Avg_Rank` = c(
++ mean(data[which(data$`Commute_Time` < 4 & data$`Commute_Time` >= 0),]$`Commute_Rank`), 
++ mean(data[which(data$`Commute_Time` < 8 & data$`Commute_Time` >= 4),]$`Commute_Rank`), 
++ mean(data[which(data$`Commute_Time` < 12 & data$`Commute_Time` >= 8),]$`Commute_Rank`), 
++ mean(data[which(data$`Commute_Time` < 16 & data$`Commute_Time` >= 12),]$`Commute_Rank`), 
++ mean(data[which(data$`Commute_Time` <= 20 & data$`Commute_Time` >= 16),]$`Commute_Rank`))
+
+#Producing and Fromatting the Graph
+Commute_Rank_Graph = plot_ly(x = c("0-4 Hours", "4-8 Hours", "8-12 Hours", "12-16 Hours", "16-20 Hours"), y = `Commute_Avg_Rank`, type = "bar",text = `Commute_Avg_Rank`, marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8, 48, 107', width = 1.2)))
+Commute_Rank_Graph = layout(Commute_Rank_Graph, title = "Rank vs Commute Hours", xaxis = list(title = "Hours in Commute per week", categoryorder = "array", categoryarray = c("0-4 Hours", "4-8 Hours", "8-12 Hours", "12-16 Hours", "16-20 Hours")), yaxis = list(title = "Average Rank (Out of 7)"), paper_bgcolor = 'rgba(245, 246, 249, 1)', plot_bgcolor = 'rgba(245, 246, 249, 1)')
+Commute_Rank_Graph
+```
+
+This was simply because more time was spent in transit, which could have been utilized towards other activities; specifically sleep and study.
+
+Again, correlating to Question 1, we found that if an individual receives less sleep per night they rank sleep higher as a cause of stress. This is reflected in the negatively skewed bar plot.
+
+```{r}
+#Calculating Avg Rank of each interval of Sleep factor
+Sleep_Avg_Rank = c(
++ mean(data[which(data$Sleep_Time < 5 & data$Sleep_Time >= 0),]$Less_Sleep_Rank), 
++ mean(data[which(data$Sleep_Time < 6 & data$Sleep_Time >= 5),]$Less_Sleep_Rank), 
++ mean(data[which(data$Sleep_Time < 7 & data$Sleep_Time >= 6),]$Less_Sleep_Rank), 
++ mean(data[which(data$Sleep_Time < 8 & data$Sleep_Time >= 7),]$Less_Sleep_Rank), 
++ mean(data[which(data$Sleep_Time < 9 & data$Sleep_Time >= 8),]$Less_Sleep_Rank),
++ mean(data[which(data$Sleep_Time < 10 & data$Sleep_Time >= 9),]$Less_Sleep_Rank))
+
+#Producing and Formatting the Graph
+Sleep_Rank_Graph = plot_ly(x = c("0-5 Hours", "5-6 Hours", "6-7 Hours", "7-8 Hours", "8-9 Hours","9-10 Hours"), y = Sleep_Avg_Rank, type = "bar", marker = list(color = 'rgb(158,202,225)', line = list(color = 'rgb(8, 48, 107', width = 1.2)))
+Sleep_Rank_Graph = layout(Sleep_Rank_Graph, title = "Rank vs Sleep Hours", xaxis = list(title = "Hours of Sleep per day", categoryorder = "array", categoryarray = c("0-5 Hours", "5-6 Hours", "6-7 Hours", "7-8 Hours", "8-9 Hours","9-10 Hours")), yaxis = list(title = "Average Rank (Out of 7)"), paper_bgcolor = 'rgba(245, 246, 249, 1)', plot_bgcolor = 'rgba(245, 246, 249, 1)')
+
+Sleep_Rank_Graph
+```
+
+We already know from Question 1 that people who get less sleep are more stressed overall. However, an analysis of this graph reveals that they also rank sleeping as a cause of this stress.
+
+<br>
+
+# Conclusion
+
+Stress is mostly a subjective response that varies between individuals, which made analyzing data difficult with a relatively small sample size. However, there has been an obvious trend throughout the whole survey; sleep is an integral factor of stress. We were even surprised at the weighting it had on stress levels, indicating that even a few extra hours a night really can benefit students tremendously.
+
+# Further Reseach and References
+
+1. Survey link  
+<https://tinyurl.com/y45nulux>
+
+2. University of Leicester, 2019, Exam Stress, Accessed 17-04-2019 <https://www2.le.ac.uk/offices/ld/resources/study/exam-stress>
+
+3. Hill, Curtis (2014) "School Stress, Academic Performance, and Coping in College Freshmen," Ursidae: The Undergraduate Research Journal at the University of Northern Colorado: Vol. 4 : No. 2 , Article 9
+<https://digscholarship.unco.edu/cgi/viewcontent.cgi?article=1089&context=urj>
+
+<br>
