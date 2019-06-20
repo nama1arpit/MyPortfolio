@@ -14,7 +14,7 @@ This dataset, also sourced from the ABS, contains the total amount of businesses
 This is a synthetic CSV file provided by the Sydney City Council that describes the physical location of various bike sharing pods as well as the number of scooters and bikes a certain station has capacity for.
 #### CycleParkingNetwork.JSON
 This API JSON data source contains a list of the locations of bike parking spots in Sydney.
-Sourced From: [City of Sydney Council, University of Sydney, '2017 Cycle Parking Pod Positions' URL: http://soit-app-pro-4.ucc.usyd.edu.au:3000/(accessed 24 May 2019)]
+Sourced From: [City of Sydney Council, University of Sydney, '2017 Cycle Parking Pod Positions' URL: http://soit-app-pro-4.ucc.usyd.edu.au:3000/ (accessed 24 May 2019)]
 
 ### Pre-processing the data
 
