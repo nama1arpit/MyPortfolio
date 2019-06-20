@@ -26,4 +26,4 @@ Repository containing all my projects.
 		- [AeroDB](https://github.com/nama1arpit/MyPortfolio/tree/master/AeroDB-Database(JAVA) "AeroDB"):
 		AeroDB is a key-value based database completely in the Java programming language using dynamic data structures. All entries to the database contain a unique key which will map to a set of values. Each entry of the database is identified by a unique key string and contains a dynamically sized list of integer values.
 
-If you liked anything or just would like to have a fun discussion on anything, shoot me an e-mail: nama1arpit@gmail.com, anam9745@uni.sydney.edu.au
+Please contact me at nama1arpit@gmail.com or anam9745@uni.sydney.edu.au
