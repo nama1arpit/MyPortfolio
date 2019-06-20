@@ -6,7 +6,7 @@ Repository containing all my projects.
 - ### Data Analysis and Visualisation
 	- __Python__
 		- 
-		- [Cyclability Analysis(SQL)](https://github.com/nama1arpit/MyPortfolio/tree/master/Cyclability_Analysis" Cyclability Analysis(SQL)")
+		- [Cyclability Analysis(SQL)]("https://github.com/nama1arpit/MyPortfolio/tree/master/Cyclability_Analysis" Cyclability Analysis(SQL)")
 
 	- __R__ 
 		- [Crash Severity and Frequency](https://github.com/nama1arpit/MyPortfolio/tree/master/Crash_Severity_and_Frequency(R) "Crash Severity and Frequency")
