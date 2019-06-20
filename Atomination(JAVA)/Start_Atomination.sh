@@ -1,0 +1,1 @@
+java -cp ".;lib\core.jar" AtominationGUI
