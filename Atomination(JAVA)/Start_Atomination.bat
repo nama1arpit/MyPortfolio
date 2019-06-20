@@ -1,1 +1,1 @@
-java -cp ".;lib\core.jar" AtominationGUI
+java Atomination
