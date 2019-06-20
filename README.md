@@ -5,7 +5,6 @@ Repository containing all my projects.
 
 - ### Data Analysis and Visualisation
 	- __Python__
-		- 
 		- [Cyclability Analysis(SQL)](https://github.com/nama1arpit/MyPortfolio/tree/master/Cyclability_Analysis "Cyclability Analysis(SQL)")
 
 	- __R__ 
