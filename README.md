@@ -6,6 +6,9 @@ Repository containing all my projects.
 	- __Random Forests__
 		- [Blue Book for Bulldozers](https://github.com/nama1arpit/MyPortfolio/tree/master/Blue_Book_For_Bulldozers):
 		In this project, we will go through a journey of making a highly efficient Random Forest model for Kaggle's competition - Blue Book For Bulldozers(https://www.kaggle.com/c/bluebook-for-bulldozers/overview) Here, we will go through each step from data preparation and hyperparameter tuning to data interpretation and analysis in a detailed manner.
+	- __Deep Learning__
+		- [Face Expression Classifier](https://www.kaggle.com/nama1arpit/expression-identifier):
+		In this Jupyter notebook, we will train a convulational neural network(CNN) on the data gathered from [face-expression-recognition-dataset](https://www.kaggle.com/jonathanoheix/face-expression-recognition-dataset). This dataset contains images of faces with variety of expression with labels such as __angry__, __disgust__, __fear__, __happy__, __neutral__, __sad__ and __surprise__. Here I will be using fast.ai and PyTorch libraries to train and tune my CNN with resnet50 architecture.
 - ### Data Analysis and Visualisation
 	- __Python__
 		- [Cyclability Analysis(SQL)](https://github.com/nama1arpit/MyPortfolio/tree/master/Cyclability_Analysis "Cyclability Analysis(SQL)"):
