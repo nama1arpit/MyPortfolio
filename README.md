@@ -23,6 +23,9 @@ Repository containing all my projects.
 		
 		- [International and Domestic Students](https://github.com/nama1arpit/MyPortfolio/tree/master/International_and_Domestic_Students(R) "International and Domestic Students"):
 		The aim of this report is to determine whether there is a significant difference between the grades of International and Domestic students, using hypothesis testing. If there was indeed a difference, then we would attempt to establish a possible cause for this, by looking to see if their frequency of using Canvas had any effect on their grades, using a scatterplot.
+		
+		- [CensusAtSchool New Zealand](https://github.com/nama1arpit/MyPortfolio/tree/master/CensusAtSchool_New_Zealand):
+		This reports aims to test many arguments on population set based on a diverse yet rich sample dataset downloaded from https://new.censusatschool.org.nz/. A variety of tests including Chi-squared goodness of fit test, test for homogenity, test for independence, fisher test and monte-carlo simulation has been used to answer relevant questions. Graphical and numerical summaries has been used appropriately.
 	
 - ### Developement
 	- __Java__
