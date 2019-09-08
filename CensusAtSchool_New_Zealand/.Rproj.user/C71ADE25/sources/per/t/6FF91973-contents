@@ -1,0 +1,182 @@
+#1 Replacing NA, getting clean and short column names
+library(ggplot2)
+library(plotly)
+data = read_csv("data/sample_data.csv", na = c("n/a", "", " ", "NA", "na"))
+
+View(data)
+data = janitor::clean_names(data)
+
+glimpse(data)
+
+#for (i in 1:78)
+#{
+#  col = names(data)[i]
+# print(unique(data[col]))
+#}
+
+data = data %>% 
+  rename(
+    litter_lunch = litter_in_lunch,
+    fruit_veg_lunch = fruit_vegetables_in_lunch,
+    check_msg_waking_up = check_messages_as_soon_as_you_wake_up,
+    respond_msg_fast = respond_to_messages_immediately,
+    time_home_from_school = time_you_get_home_from_school,
+    time_eat_dinner = time_you_ate_dinner,
+    true_carried_by_feeling = how_true_i_get_carried_away_by_my_feelings,
+    true_saying_without_thinking = how_true_i_say_the_first_thing_that_comes_into_my_mind_without_thinking_enough_about_it,
+    true_cant_stop_knowing_its_wrong = how_true_i_cant_stop_myself_from_doing_something_even_if_i_know_it_is_wrong,
+    true_run_without_fight = how_true_i_try_to_talk_out_a_problem_instead_of_fighting,
+    true_easy_making_friends = how_true_it_is_easy_for_me_to_make_friends,
+    true_standing_for_myself = how_true_i_know_how_to_stand_up_for_myself_without_being_mean
+  )
+
+
+
+#3 General Demographic Information about my sample
+
+d = as.data.frame(table(data$region))
+d = d[order(Var1, decreasing = TRUE),] 
+d[1:5, ] %>% ggplot(aes(x = reorder(Var1, -Freq), y = Freq)) +  geom_bar(stat = "identity")
+
+table(data$gender) 
+
+table(data$age)
+
+table(data$country)
+
+ethnic_dist = tibble(
+  ethinicity = c("NZ_european", "Maori", "Samoan", "Cook_Islands_Maori", "Tongan", "Niuean", "Chinese", "Indian", "Other"),
+  n = c(table(data$new_zealand_european)[2], table(data$maori)[2], table(data$samoan)[2], table(data$cook_islands_maori)[2], table(data$tongan)[2], table(data$niuean)[2], table(data$chinese)[2], table(data$indian)[2], table(data$other_ethnicity)[2])
+)
+
+ethnic_dist %>% 
+  ggplot(aes(x = ethinicity, y = n)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() # Make it better looking + SORTING
+
+
+#4  What is the most common teansport to school
+
+transport_table = data %>% 
+  group_by(travel_method_to_school) %>% 
+  summarise(number = n(), percentage = (n()/200)*100)
+
+transport_table %>% 
+  drop_na(travel_method_to_school) %>% 
+  ggplot(aes(x = travel_method_to_school, y = number)) + 
+  geom_bar(stat = "identity") #Make it beautiful + sort
+
+#5 What are the most  common favourite video games?
+
+game_freq = data %>%
+  group_by(favourite_video_game) %>% 
+  count()
+
+game_freq = game_freq[order(game_freq$n, decreasing = TRUE),] %>% 
+  drop_na()
+
+game_freq = game_freq[-1,]
+
+game_freq[1:10,]
+
+game_freq[1:5,] %>% 
+  ggplot(aes(x = reorder(favourite_video_game, -n), y = n)) +
+  geom_bar(stat = "identity")
+
+
+#6 It is hypothesised that 90% of the population are right handed. Does your sample of data support this hypothesis?
+
+hand_dist = data %>% 
+  group_by(handedness) %>% 
+  count() %>% 
+  drop_na()
+
+hand_dist = hand_dist[-1,]
+
+p = c(0.1, 0.9)
+hand_dist$p = c(0.1, 0.9)
+hand_dist = hand_dist %>% 
+  mutate(
+    e = p*(165+19)
+  )
+
+all(hand_dist$e >= 5)
+
+hand_dist = hand_dist %>% 
+  mutate(
+    r2 = (n - e)^2/e
+  )
+
+t0 = sum(hand_dist$r2)
+
+      #Simulation
+n_tot = sum(hand_dist$n)
+
+B = 10000
+sim_test_stats = vector(mode = "numeric", length = B)
+
+for (i in 1:B)
+{
+  sim_dat = sample(c("left", "right"), n_tot, replace = TRUE, prob = p) %>% table()
+  exp = p*n_tot
+  sim_test_stats[i] = sum((sim_dat - exp)^2/exp)
+}
+
+p_val = mean(sim_test_stats >= t0)
+
+#7 Is handedness independent of gender
+
+gender_v_hand = data %>% 
+  janitor::tabyl(gender, handedness) 
+gender_v_hand = as.data.frame(gender_v_hand)
+gender_v_hand = gender_v_hand[,-5]
+gender_v_hand = gender_v_hand[, -1]
+
+chisq.test(gender_v_hand)
+
+
+#8 What proportion of students own a cell phone? Is this proportion constant across the different year groups? Perform a test to see if there is a statistically significant difference in cell phone ownership across year groups.
+
+yearwise_phone_dist = data %>% 
+  drop_na(own_cell_phone) %>% 
+  group_by(year) %>%
+  summarise(
+    own = mean(own_cell_phone == "yes")*n(),
+    not_own = 20 - own
+  )
+
+yearwise_phone_dist %>% 
+  ggplot(aes(x = year, y = 20, fill = own)) +
+  geom_bar(stat = "identity")
+
+yearwise_phone_dist %>% 
+  ggplot(aes(x = year, y = own)) +
+  geom_bar(stat = "identity")
+
+chisq.test(yearwise_phone_dist[, -1]) #test for homogenity
+
+#9 Restricting attention to students in years 7 to 12 who own a cell
+
+
+anx_dist = data %>% 
+  filter(year %in% c(7, 8, 9, 10, 11, 12, 13)) %>% 
+  drop_na(check_msg_waking_up) %>% 
+  group_by(check_msg_waking_up) %>% 
+  summarise(
+    anxious = mean(feeling_without_phone_anxious == "yes")*n(),
+    not_anxious = n() - anxious
+  )
+
+fisher.test(anx_dist[,-1]) #because e was less than 5
+
+    #Monte-Carlo
+
+chisq.test(anx_dist[,-1], simulate.p.value = TRUE, B = 10000)
+
+#10 Other Question - Association between eye color and gender - Test for independence
+
+sex_v_eye = table(data$gender, data$eye_colour)
+
+fisher.test(sex_v_eye)
+
+#11 Problems with data

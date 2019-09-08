@@ -1,0 +1,29 @@
+"0","data = read_csv(""data/sample_data.csv"", na = c(""n/a"", """", "" "", ""NA"", ""na""))"
+"2","Parsed with column specification:
+cols(
+  .default = col_character(),
+  Year = [32mcol_double()[39m,
+  Age = [32mcol_double()[39m,
+  `Languages spoken` = [32mcol_double()[39m,
+  Height = [32mcol_double()[39m,
+  `Right foot length` = [32mcol_double()[39m,
+  `Wrist circumference` = [32mcol_double()[39m,
+  `Left thumb circumference` = [32mcol_double()[39m,
+  `Travel time to school` = [32mcol_double()[39m,
+  `Bag weight` = [32mcol_double()[39m,
+  `Fruit/vegetables in lunch` = [32mcol_double()[39m,
+  `Memory time` = [32mcol_double()[39m,
+  `Reaction time` = [32mcol_double()[39m,
+  `Time standing on left leg` = [32mcol_double()[39m,
+  `Physical activity - on the weekend` = [32mcol_double()[39m,
+  `Scheduled activities in last week` = [32mcol_double()[39m,
+  `Screen time after school` = [32mcol_double()[39m,
+  `Bed time` = [34mcol_time(format = """")[39m,
+  `Wake time` = [34mcol_time(format = """")[39m,
+  `Sleep time` = [32mcol_double()[39m,
+  `Time you get home from school` = [34mcol_time(format = """")[39m
+  # ... with 15 more columns
+)
+"
+"2","See spec(...) for full column specifications.
+"

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1567400232164.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1322482584",
+    "id" : "6FF91973",
+    "lastKnownWriteTime" : 1567428639,
+    "last_content_update" : 1567428639209,
+    "path" : "D:/UNI_ACAD/2019Sem2(Sem3)/DATA2902/Lab/Module1_report/R_code.R",
+    "project_path" : "R_code.R",
+    "properties" : {
+        "cursorPosition" : "177,0",
+        "scrollLine" : "128",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

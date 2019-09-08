@@ -1,0 +1,570 @@
+---
+title: "Module 1 Report"
+subtitle: "Data2902 Project 1"
+author: '490283370'
+date: "University of Sydney | DATA2902 | AUGUST 2019"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    number_sections: yes
+    css: style.css
+  
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    self_contained: yes
+    theme: lumen
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Overview
+
+## Data Collection
+
+The data is collected by CensusAtSchool NZ from the students in Years 4 to 13. Various schools take part in this online survey voluntarily. The students complete this survey during their class, which is then uploaded. This data and results are returned to the teachers after the completion as the aim of this project is to improve statistical literacy and IT education. CensusAtSchool is organized by the University of Auckland in association with StatsNZ and the Ministry of Education. 
+
+The sample data-set for this report includes the data of randomly selected 20 students from each Year. Each student’s information is collected separately, with variables such as year, region, age, gender, country, etc. It is quite rich in variable types as it includes various types of both categorical and numerical data. 
+
+## Handling Missing Values
+
+Beginning with including important libraries used in the complete report.
+```{r, message=FALSE}
+library(tidyverse)
+library(plotly)
+```
+Next, importing data set from the csv file downloaded from random sampler at https://new.censusatschool.org.nz/random-sampler/ .
+
+```{r, warning=FALSE}
+data = read_csv("data/sample_data.csv", na = c("n/a", "", " ", "NA", "na"))
+```
+
+For easier analysis, some variable names has been shortened as shown below and Some symbols and blank spaces in the names were also removed using `janitor`'s function `clean_names` ,as it might create issues later.
+```{r}
+data = janitor::clean_names(data)
+
+data = data %>% 
+  rename(
+    litter_lunch = litter_in_lunch,
+    fruit_veg_lunch = fruit_vegetables_in_lunch,
+    check_msg_waking_up = check_messages_as_soon_as_you_wake_up,
+    respond_msg_fast = respond_to_messages_immediately,
+    time_home_from_school = time_you_get_home_from_school,
+    time_eat_dinner = time_you_ate_dinner,
+    true_carried_by_feeling = how_true_i_get_carried_away_by_my_feelings,
+    true_saying_without_thinking = how_true_i_say_the_first_thing_that_comes_into_my_mind_without_thinking_enough_about_it,
+    true_cant_stop_knowing_its_wrong = how_true_i_cant_stop_myself_from_doing_something_even_if_i_know_it_is_wrong,
+    true_run_without_fight = how_true_i_try_to_talk_out_a_problem_instead_of_fighting,
+    true_easy_making_friends = how_true_it_is_easy_for_me_to_make_friends,
+    true_standing_for_myself = how_true_i_know_how_to_stand_up_for_myself_without_being_mean
+  )
+```
+
+In most of the variables, missing values were already denoted as NA, however, in some variables like `check_msg_waking_up`, `respond_msg_fast`, `take_phone_to_school` and more, the string “n/a”, "", "na", "NA" and " " were entered. They have been changed to NA to avoid any further analysis problems.
+
+A table is created showing the ratio of missing values in each column. The top 10 columns with highest ratio of missing values are given below.
+
+Except the first column named `Other ethnicity`, others have questions where students were asked about their opinion on alcohol, cigarettes and drugs; students might be shy, defensive or insecure while talking about such sensitive topics. 
+
+Highest ratio of missing values, i.e. "Other ethnicity" can be explained easily as most of the students chose specific options for ethnicity.
+
+```{r, warning=FALSE}
+data %>% 
+  gather(col, value) %>% 
+  group_by(col) %>% 
+  summarise(missing_value_ratio = mean(is.na(value))) %>% 
+  arrange(desc(missing_value_ratio)) %>% 
+  head(10)
+```
+
+# Data Analysis
+
+## Demographic Information
+
+- __Region__
+
+Most of the students are from Auckland and Canterbury (50%). The bar plot below represents the number of students in those 5 regions where the numbers were highest. The other regions are not represented in the bar plot as they contained minimal number of students (21.5%). In the below-given plot the x-axis denotes Nominal Categorical variable and the y-axis denotes discrete numerical variable.
+
+While preparing this bar-plot, a frequent table of regions, using function `table`, was created. This table was converted to a data frame, so that we can apply wide variety of functions easily to it. The rows are arranged (using `arrange`) in decreasing order of frequencies and then the top 5 of them are plotted attractively using `ggplot`.
+
+```{r}
+table(data$region) %>% 
+  as.data.frame() %>% 
+  arrange(desc(Freq))  %>% 
+  head(5) %>% 
+  ggplot(aes(reorder(Var1, -Freq), Freq)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title="Number of students in each region(Top 5)", x ="Regions", y = "Number of Students")
+```
+
+- __Gender__
+
+As given in the table below, the male to female ratio in this sample is 87:113.
+
+```{r}
+table(data$gender)
+```
+
+- __Age__
+
+The age of students in this sample range from 7 to 26.
+
+```{r}
+table(data$age) %>% 
+  data.frame() %>% 
+  `colnames<-`(c("Age", "Frequency"))
+```
+
+- __Country__
+
+Maximum number of students in this sample belong to New Zealand (81.9%). The top-10 countries based on the frequency can be seen below.
+
+```{r}
+table(data$country) %>% 
+  data.frame() %>% 
+  `colnames<-`(c("Country", "Frequency")) %>% 
+  arrange(desc(Frequency)) %>% 
+  head(10)
+```
+- __Ethnicity__ 
+
+Majority of students in this sample are New Zealand European (75%) followed by Maori (11%) and Chinese (8%). A frequency table was prepared using `table` for all ethnicities and then plotted using `ggplot` after sorting them in descending order. Ethnicity is Nominal Categorical variable and frequency is discrete numerical variable.
+
+```{r}
+ethnic_dist = tibble(
+  ethinicity = c("NZ_european", "Maori", "Samoan", "Cook_Islands_Maori", "Tongan", "Niuean", "Chinese", "Indian", "Other"),
+  n = c(table(data$new_zealand_european)[2], table(data$maori)[2], table(data$samoan)[2], table(data$cook_islands_maori)[2], table(data$tongan)[2], table(data$niuean)[2], table(data$chinese)[2], table(data$indian)[2], table(data$other_ethnicity)[2])
+)
+
+ethnic_dist %>% 
+  ggplot(aes(x = reorder(ethinicity, -n), y = n)) +
+  geom_bar(stat = 'identity', fill = "skyblue") +
+  coord_flip() +
+  labs(title="Number of students in each ethnicity", x = "Ethnicity", y = "Number of Students")
+```
+
+## Best of Mode of Transport
+
+To analyse the mode of transportation used by students to go to school, initially, the number of students using a particular method of transport was calculated using `group_by` function , `summarise` function (To get the number of entries in each group) and `arrange` function (To sort the table).
+
+```{r}
+transport_table = data %>% 
+  group_by(travel_method_to_school) %>% 
+  summarise(number = n(), percentage = (n()/200)*100) %>% 
+  arrange(desc(number))
+
+transport_table
+```
+
+The bar plot below has different modes of transport (Nominal categorical) on the x-axis and number of students (Discrete Numerical) on the y-axis. The data point with NA as their mode of transport has been removed before plotting the graph.
+
+As clearly visible in the graph, a majority of students use motor transport to travel to school (50.5%), followed by walk (19%) and bus (18%).
+
+```{r}
+transport_table %>% 
+  drop_na(travel_method_to_school) %>% 
+  ggplot(aes(x = reorder(travel_method_to_school, -number), y = number)) + 
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title="Number of students using different modes of ransport", x ="Mode of Transport", y = "Number of Students")
+```
+
+## Favorite Video Games
+
+Initially, the number of students playing each video game was calculated using `group_by` function (To group the entries based on their video games), `summarise` function (To get the number of entries in each group) and `arrange` function (To sort the table).
+
+```{r}
+game_dist = data %>% 
+  drop_na(favourite_video_game) %>%
+  group_by(favourite_video_game) %>% 
+  summarise(number = n()) %>% 
+  arrange(desc(number))
+
+game_dist %>% head(10)
+```
+
+Later, using the table `game_dist`'s top-5 elements and function `ggplot`, a bar graph (shown below) has been plotted below. It is quite clear from the graph that most students (75/188) actually don't have a favorite video game. Fortnite and Minecraft are on the second and third position, with only a gap of 3 students, which shows that they both are pretty famous among them.
+
+```{r}
+game_dist %>% 
+  head(5) %>% 
+  ggplot(aes(reorder(favourite_video_game, -number), number)) + 
+  geom_bar(stat ="identity", fill = "skyblue") +
+  labs(title="Number of students who chose each video game", x ="Favourite Video Game", y = "Number of Students")
+  
+```
+
+## Is 90% of the population right handed?
+
+To test the hypothesis that 90% of people are right-handed, chi-squared fitness of good test has been used. Our data contains categories in `handedness` variable - "right", "left", "ambi" and NA.
+
+```{r}
+hand_dist = data %>% 
+  group_by(handedness) %>% 
+  summarise(
+    number = n() #number of elements in each group
+  )
+
+hand_dist
+```
+
+To keep the focus of our hypothesis on the dominant hand, the group with "ambi" and NA values are removed.
+
+```{r}
+hand_dist = hand_dist[2:3,] #Only keeping 2nd and 3rd row
+```
+
+Specifying the hypothesis properly:
+
+1. $H_{0}: p_{r} = 0.9$ vs $H_{1}: p_{r}\neq 0.9$ ($p_{r}$ is the probability of being right handed)
+
+2. Assumption: $e_{i} = np_{i}\ge 5$ and Observations are independent.
+
+```{r}
+n = sum(hand_dist$number)
+  
+hand_dist = hand_dist %>% 
+  mutate(
+    p = c(0.1, 0.9),
+    e = p*n,
+    r2 = (number - e)^2/e
+  )
+
+hand_dist
+all(hand_dist$e >= 5)
+```
+
+The assumption seems to be true as all the expected values are greater than 5 and each entry was filled by different student individually.
+
+3. Test Statistic: $T = \sum_{i=1}^{2}\frac{(y_{i} - e_{i})^2}{e_{i}}$ Under $H_{0}$, $T\sim\chi_{2-1}^2$ approx.
+```{r}
+t0 = sum(hand_dist$r2)
+t0
+```
+
+4. Observed Test Statistic: $t_{0} = 0.021739$
+
+The simulation has been used to calculate the p-value for this hypothesis. Here, 5000 samples were taken from an array `c("left", "right")` with probabilities 0.1 and 0.9 respectively. Test statistic was also calculated for each sample and stored in an array named `sim_test_stat`. The observed test statistic `t0` was compared with all the values of `sim_test_stat`, the ratio of numbers greater than `t0` to all of them is stored in `pval` which represents our p-value.
+
+```{r}
+set.seed(1)
+B = 5000 #number of times of simulation
+p = c(0.1, 0.9) #probability values of left and right handedness
+sim_test_stat = vector(mode = "numeric", length = B)
+
+for (i in 1:B)
+{
+  sim_dat = sample(c("left", "right"), n, replace = TRUE, prob = p) %>% table() #taking out values from sample with specific probabilities
+  exp = p*n
+  sim_test_stat[i] = sum((sim_dat - exp)^2/exp) #test-statistic of each simulation
+}
+
+p_val = mean(sim_test_stat >= t0) # the p-value
+p_val
+```
+
+5. P-value: $P(\chi_{1}^2 \geq 0.021739) = 0.897$
+
+6. Decision: Since the p-value (0.897) is much greater than 0.05, it is concluded that there is not enough evidence to reject the null hypothesis and the data is consistent with the statement that 90% of the population is right-handed.
+
+## Is handedness independent of gender?
+
+To test the hypothesis that handedness is independent of gender, test of independence has been used below.
+Contingency table is created to help in the test.
+
+```{r}
+hand_v_gender = data %>% 
+  drop_na(handedness) %>% 
+  group_by(handedness) %>% 
+  summarise(
+    male = sum(gender == "male"),
+    female = n() - male
+  )
+
+hand_v_gender
+```
+
+Specifying the hypothesis properly:
+
+1. Hypothesis: $H_{0}: p_{ij} = p_{∙j}p_{i∙}~, i=1,2,3;j=1,2$ vs $H_{1}:$Not all equalities hold
+2. Assumption: $e_{i} = y_{∙j}y_{i∙}/n\ge 5$.
+
+A matrix is made with same values for easier and effective calculations as well.
+
+```{r}
+y = c(7, 6, 11, 8, 67, 98)
+n = sum(y)
+c = 3
+r = 2
+y.mat = matrix(y, nrow = r, ncol = c)
+colnames(y.mat) = c("ambi", "left", "right")
+rownames(y.mat) = c("Male", "Female")
+y.mat
+```
+
+Checking assumptions:
+
+```{r}
+yr = apply(y.mat, 1, sum)
+yc = apply(y.mat, 2, sum)
+yr.mat = matrix(yr, r, c, byrow = FALSE)
+yc.mat = matrix(yc, r, c, byrow = TRUE)
+
+ey.mat = (yr.mat * yc.mat)/sum(y.mat) #Matrix multiplication to get expected values of each cell in y.mat
+
+ey.mat
+
+all(ey.mat >= 5)
+```
+
+The assumption seems to be true as all the expected values are greater than 5.
+
+3. Test Statistic: $T = \sum_{i=1}^{r}\sum_{j=1}^c\frac{(y_{ij} - e_{ij})^2}{e_{ij}}$ Under $H_{0}$, $T\sim\chi_{(3-1)(2-1)}^2$ approx.
+The degree of freedom is calculated with the formula $df = (r-1)(c-1)$, where r is number of rows and c is number of columns.
+
+`chisq.test` function is used for the Pearson's Chi-squared test.
+
+```{r}
+chisq.test(y.mat)
+```
+
+4. Observed Test Statistic: $t_{0} = 2.7255$
+
+5. P-value: $P(\chi_{2}^2 \geq 2.7255) = 0.256$
+
+6. Decision: Since the p-value (0.256) is much greater than 0.05. It is concluded that there is not enough evidence to reject the null hypothesis and this data set is consistent with the null hypothesis, stating that gender and handedness are independent of each other.
+
+## Cell phone ownership across year groups
+
+Dropping the NA values in `own_cell_phone` variable, a table has been created showing the proportion of students owning a cell phone to the students (who responded to question) in their year.
+
+```{r}
+year_v_phone = data %>% 
+  drop_na(own_cell_phone) %>% 
+  group_by(year) %>%
+  summarise(
+    own = sum(own_cell_phone == "yes"),
+    not_own = sum(own_cell_phone == "no"),
+    proportion = own/n()
+  )
+
+year_v_phone
+```
+
+A depiction of the above table is shown using `ggplot`.
+
+```{r}
+year_v_phone %>% 
+  ggplot(aes(year, proportion)) + 
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title="Proportion of students owning a cell phone", x ="Year Group", y = "Proportion")
+```
+
+The proportion of students owning a cell phone seems to constantly increase from year 4 to year 10. However, from year 10 to 13 the proportion stays around 1. It can be predicted that usually parents give phones to their children when they think they are mature and old enough. 
+
+To check if the proportion of owning a cell phone is constant over all the years, test for homogeneity has been used below.
+
+1. Hypothesis: $H_{0}: p_{1j}=p_{2j}=p_{3j}\dots=p_{10j}, j=1,2$ vs $H_{1}:$Not all equalities hold
+2. Assumption: $e_{i} = y_{∙j}y_{i∙}/n\ge 5$.
+
+Making a matrix with same values for easier and effective calculations.
+
+```{r}
+y = c(3, 17, 5, 14, 9, 11, 12, 8, 16, 4, 19, 1, 20, 0, 19, 1, 19, 1, 20, 0)
+n = sum(y)
+c = 2
+r = 10
+y.mat = matrix(y, nrow = r, ncol = c, byrow = TRUE)
+colnames(y.mat) = c("own", "not_own")
+rownames(y.mat) = c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+y.mat
+```
+
+Checking assumptions:
+
+```{r}
+yr = apply(y.mat, 1, sum)
+yc = apply(y.mat, 2, sum)
+yr.mat = matrix(yr, r, c, byrow = FALSE)
+yc.mat = matrix(yc, r, c, byrow = TRUE)
+
+ey.mat = (yr.mat * yc.mat)/sum(y.mat) #Matrix multiplication to get expected values of each cell in y.mat
+
+ey.mat
+
+all(ey.mat >= 5)
+```
+
+The assumption seems to be true as all the expected values are greater than 5.
+
+3. Test Statistic: $T = \sum_{i=1}^{10}\sum_{j=1}^2\frac{(Y_{ij} - e_{ij})^2}{e_{ij}}$ Under $H_{0}$, $T\sim\chi_{(10-1)(2-1)}^2$ approx.
+The degree of freedom was calculated with the formula $df = (r-1)(c-1)$, where r is number of rows and c is number of columns.
+
+Using `chisq.test` function for the Pearson's Chi-squared test:
+
+```{r}
+chisq.test(y.mat)
+```
+
+4. Observed Test Statistic: $t_{0} = 91.195$
+
+5. P-value: $P(\chi_{2}^2 \geq 91.195) < 0.000001$
+
+6. Decision: Since the p-value (<0.000001) is much less than 0.05. It is concluded that there is sufficiently enough evidence to reject the null hypothesis at 5% significance level and this data set is not consistent with the null hypothesis stating that gender and handedness are independent of each other.
+
+
+## Association between the tendency to check messages as soon as a student in years 7 to 12 wake up and feeling anxious when they’re without their phone
+
+By grouping the `data` by variable `own_cell_phone`, filtering using `filter` function on years 7 to 12, a contingency table has been created on how many students are anxious in each of the category. Rows with NA values in variable `check_msg_waking_up` was also removed to decrease complications.
+
+```{r}
+data %>% 
+  filter(year %in% c(7, 8, 9, 10, 11, 12)) %>% 
+  drop_na(check_msg_waking_up) %>% 
+  group_by(check_msg_waking_up) %>% 
+  summarise(
+    anxious = sum(feeling_without_phone_anxious == "yes"),
+    not_anxious = sum(feeling_without_phone_anxious == "no")
+  )
+```
+
+Making a matrix with same values for easier and effective calculations:
+
+```{r}
+y = c(5, 19, 0, 14, 4, 18, 1, 23, 3, 18)
+n = sum(y)
+c = 2
+r = 5
+y.mat = matrix(y, nrow = r, ncol = c, byrow = TRUE)
+colnames(y.mat) = c("anxious", "not_anxious")
+rownames(y.mat) = c("always", "never", "often", "rarely", "sometimes")
+y.mat
+```
+
+Checking the expected values for each cell in `y.mat`:
+
+```{r}
+yr = apply(y.mat, 1, sum)
+yc = apply(y.mat, 2, sum)
+yr.mat = matrix(yr, r, c, byrow = FALSE)
+yc.mat = matrix(yc, r, c, byrow = TRUE)
+
+ey.mat = (yr.mat * yc.mat)/sum(y.mat) #Matrix multiplication to get expected values of each cell in y.mat
+
+ey.mat
+
+all(ey.mat >= 5)
+```
+
+Because all the expected values are not greater than 5, we can't use normal chi-squared test as we can't approximate test-statistic's distribution to $\chi^2$. Hence, the fisher test should be used here.
+
+1. Hypothesis: $H_{0}: p_{1j}=p_{2j}=p_{3j}\dots=p_{5j}, j=1,2$ vs $H_{1}:$Not all equalities hold.
+
+2. Assumptions: Row and column margins are fixed.
+
+Using `fisher.test` function for the Fisher's exact test with alternative hypothesis as `two.sided`:
+
+```{r}
+fisher.test(y.mat)
+```
+
+3. P-value: $P = 0.2176$
+
+4. Decision: Since the p-value (0.2176) is much greater than 0.05. It is concluded that there is not enough evidence to reject the null hypothesis at 5% significance level and this data set is consistent with the null hypothesis stating that the tendency to check messages as soon as a student in years 7 to 12 wake up and feeling anxious when they’re without their phone; are independent of each other.
+
+Using Monte-Carlo simulation for the same hypothesis:
+
+```{r}
+chisq.test(y.mat, simulate.p.value = TRUE, B = 10000)
+```
+
+Result: The p-value comes out to be 0.2108 which is very close to 0.2176 from the fisher test for the same hypothesis. It shows that Monte-Carlo simulation can be very useful in case expected values go less than 5.
+
+## Gender vs Physical activity at school
+
+Making a contingency table of variables `physical_activity_at_school` vs `gender`:
+
+```{r}
+data %>% 
+  drop_na(physical_activity_at_school) %>% 
+  group_by(physical_activity_at_school) %>% 
+  summarise(
+    male = sum(gender == "male"),
+    female = sum(gender == "female")
+  )
+```
+
+To test the hypothesis that `physical_activity_at_school` and `gender` are independent of each other, test of independence has been used.
+
+1. Hypothesis: $H_{0}: p_{ij} = p_{∙j}p_{i∙}~, i=1,2;j=1,2,3,4$ vs $H_{1}:$Not all equalities hold
+
+2. Assumption: $e_{i} = y_{∙j}y_{i∙}/n\ge 5$.
+
+Making a matrix with same values for easier and effective calculations:
+
+```{r}
+y = c(19, 16, 11, 36, 39, 24, 16, 27)
+n = sum(y)
+c = 4
+r = 2
+y.mat = matrix(y, nrow = r, ncol = c, byrow = T)
+colnames(y.mat) = c("0", "1", "2","3+")
+rownames(y.mat) = c("Male", "Female")
+y.mat
+```
+
+Checking assumptions:
+
+```{r}
+yr = apply(y.mat, 1, sum)
+yc = apply(y.mat, 2, sum)
+yr.mat = matrix(yr, r, c, byrow = FALSE)
+yc.mat = matrix(yc, r, c, byrow = TRUE)
+
+ey.mat = (yr.mat * yc.mat)/sum(y.mat) #Matrix multiplication to get expected values of each cell in y.mat
+
+ey.mat
+
+all(ey.mat >= 5)
+```
+
+The assumption seems to be true as all the expected values are greater than 5.
+
+3. Test Statistic: $T = \sum_{i=1}^{r}\sum_{j=1}^c\frac{(y_{ij} - e_{ij})^2}{e_{ij}}$ Under $H_{0}$, $T\sim\chi_{(4-1)(2-1)}^2$ approx.
+The degree of freedom was calculated with the formula $df = (r-1)(c-1)$, where r is number of rows and c is number of columns.
+
+Using `chisq.test` function for the Pearson's Chi-squared test:
+
+```{r}
+chisq.test(y.mat)
+```
+
+4. Observed Test Statistic: $t_{0} = 7.771$
+
+5. P-value: $P(\chi_{3}^2 \geq 7.771) = 0.5099$
+
+6. Decision: Since the p-value (0.05099) is a little bit greater than 0.05, it is concluded that there is not enough evidence to reject the null hypothesis and this data set is loosely consistent with the null hypothesis stating that gender and physical activity at school are independent of each other.
+
+# Limitations of the data set
+
+- Non Response Bias: Some variables, especially when the students were asked to give their opinion on alcohol, cigarette and drug use, most entries are null which makes it difficult to analyze related topics. 
+
+- Most of the students in this sample data set belong to New Zealand, so the analyses cannot be extended internationally.
+
+- Measurement Bias: Some questions asked in the survey were sensitive like asking students if they bring phones to school or if they check messages as soon as they wake up or how anxious they are without them; it is quite probable that they lie in such questions due to peer pressure or insecurity.
+
+# References
+
+- CensusAtSchool: https://new.censusatschool.org.nz/about
+
+- Ggplot2 documentation: https://ggplot2.tidyverse.org/
+
+- Dplyr documentation: https://dplyr.tidyverse.org/
+
+- Richard J. Larsen, Morris L. Marx - Introduction to Mathematical Statistics and Its Applications, An (4th Edition)-Prentice Hall (2005)
