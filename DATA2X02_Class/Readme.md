@@ -1,0 +1,3 @@
+## DATA2X02 Students Analysis
+
+This report aims to determine significant difference between many variables about the data collected from the students of DATA2X02 2019 class at the University of Sydney. The data was collected using an online survey, which included many kind of questions resulting in various types of varaibles for analysis. A variety of tests including Wilcoxon sign test, Wilcoxon rank-sum test, Permutation test and Hotelling's T-test have been used. Graphical and numerical summaries has been used thoroughly to analyse the assumptions for each of the hypothesis test. Clean R-markdown theme with quality plots were also added to make the report visually appealing. Please open the HTML file for the report.
