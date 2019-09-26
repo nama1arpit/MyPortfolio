@@ -26,7 +26,9 @@ Repository containing all my projects.
 		
 		- [CensusAtSchool New Zealand](https://github.com/nama1arpit/MyPortfolio/tree/master/CensusAtSchool_New_Zealand):
 		This reports aims to test many arguments on population set based on a diverse yet rich sample dataset downloaded from [CensusAtSchool(NZ)](https://new.censusatschool.org.nz/random-sampler/). The dataset contains many features of students from year 4 to year 13 including age, gender, opinions on drugs, ethnicity, cell phone habits, etc. A variety of tests including Chi-squared goodness of fit test, test for homogenity, test for independence, fisher test and monte-carlo simulation has been used to answer relevant questions. Graphical and numerical summaries has been used appropriately.
-	
+		
+		- [DATA2X02 Students Analysis](https://github.com/nama1arpit/MyPortfolio/tree/master/DATA2X02_Class): This report aims to determine significant difference between many variables about the data collected from the students of DATA2X02 2019 class at the University of Sydney. The data was collected using an online survey, which included many kind of questions resulting in various types of varaibles for analysis. A variety of tests including Wilcoxon sign test, Wilcoxon rank-sum test, Permutation test and Hotelling's T-test have been used. Graphical and numerical summaries has been used thoroughly to analyse the assumptions for each of the hypothesis test. Clean R-markdown theme with quality plots were also added to make the report visually appealing.
+		
 - ### Developement
 	- __Java__
 		- [Atomination](https://github.com/nama1arpit/MyPortfolio/tree/master/Atomination(JAVA) "Atomination"):
